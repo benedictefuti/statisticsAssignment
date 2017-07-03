@@ -1,0 +1,211 @@
+---
+title: "Assignment"
+author: '711167'
+date: "July 3, 2017"
+output: md_document
+---
+
+
+
+## Hello Octocat
+
+I love Octocat. She’s the coolest cat in town.
+![octocat](https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/assignments/octocat.png)
+```
+```
+## assignment 2
+
+```{r quick_look, echo=TRUE}
+data("anscombe")
+dim.data.frame(anscombe)
+colnames(anscombe)
+head(anscombe)
+tail(anscombe)
+summary(anscombe)
+
+```
+
+## assignment 3
+```{r xy_plot, echo=FALSE, fig.height=8, fig.width=8, fig.align='center', dev='svg', fig.path='.figures/'}
+data("anscombe")
+anscombe
+with(anscombe,plot(x1,y1))
+abline(lm(y1~x1, data=anscombe))
+```
+# assignment 4
+
+```{r data_import, echo=TRUE}
+#load package
+
+library("readr")
+#to import and read the data
+df <- data.frame(read_csv("https://dl.dropboxusercontent.com/u/11805474/painblogr/biostats/assignments/analgesic.csv"))
+df
+
+
+```
+
+```{r data_summary, echo=TRUE}
+dim(df) #to display the data dimension
+colnames(df) #to display the columns names
+head(df) #to display the head (first lines) of the data
+tail(df) #to display the tail (last lines) of the data
+summary(df) #to produce summary statistics of the data's variables
+
+```
+
+```{r data_tidy, echo=TRUE}
+#load packages
+library(knitr)
+#to manipulate the data
+library(dplyr) 
+# to tidy the data
+library(tidyr) 
+# gather the data columns into a key-value pairs
+df_1 <- gather(df, Measurements, Results, Measurement_1, Measurement_2, Measurement_3, factor_key = TRUE )
+# group the variables
+df_2 <- group_by(df_1) 
+df_2
+# produce summary statistics of df variables
+summarise(df_2, mean(Results)) 
+# print out 'df'
+print(df_2)
+
+```
+
+#assignment 5
+
+## Chicken weights
+```{r}
+#Null hypothesis
+##Ho= the chicken weight is dependent on the feeds
+
+#read the chicken weight data and assign the data to 'df'
+## load package
+library(knitr)
+library(readr)
+#read and assign to 'df'
+chick <-data.frame(read.csv("chick-weights.csv"))
+#display the data
+chick  #data are already tidy
+#plot the data
+boxplot(chick$weight ~ chick$feed, data = chick)
+# statistical test
+chick_1 <- aov(weight~feed, data = chick)
+summary(chick_1)
+summary.aov(chick_1)
+# degree of freedom and p-value
+##df= 5
+#p-value<0.05
+#conclusion
+#we reject the null hypothesis, therefore, chicken weights is not dependant on the feed
+```
+
+
+# the hot zone
+
+```{r the hot zone, echo= TRUE }
+#null hypothesis
+#Ho= contaminated water doesnt cause gastroenteritis
+# alternative hypotesis: contaminated water causes gastroenteritis
+# importing and reading data
+library(knitr)
+library(readr)
+hot <- data.frame(read.csv("gastroenteritis.csv"))
+hot
+# tidy data
+library(tidyr)
+library(dplyr)
+hot_table <- xtabs(~Consumption + Outcome, data = hot)
+hot_graph <- barplot(hot_table, beside = TRUE, ylab = 'Consumption', xlab = 'Outcome', main = 'GASTROENTERITIS', col = c('blue', 'red', 'grey'), legend.text = c('<1 glasses/day', '1 to 4 glasses/day', '>4 glasses/day'))
+
+#statistical test
+##we analyse two categorical data from the same population in order to assess possible association between ccontaminated water consumption and illness ( gastroenteritis). => we will use the chi square test.
+## chi-square test
+test <- chisq.test(hot_table, correct = TRUE)
+test       
+#degree of freedom:
+#Df= 2
+#p-value
+#p-value < 0.05
+
+#conclusion
+#the null hypothesis is rejected, therefore, we can conclude that contaminated water causes gastroenteritis
+
+
+```
+
+# Nausea
+
+```{r}
+#Null hypothesis
+##Ho= chemoterapy treatment does not cause nausea
+# Importing and reading data
+library(knitr)
+library(readr)
+nausea <- read.csv("nausea.csv")
+nausea
+#Tidy data
+library(tidyr)
+library(dplyr)
+#the rating scale of nausea intensity is anchored from 0 to 6, with 0 being 'no nausea' and 6 being ' severe nausea and vomiting'.
+#data at row=8 and column=3 dsplay 40. this may be an error in typing.
+#change data at row=8 and column= 3 from 40 to 4
+nausea[8,3]= 4
+nausea
+#plotting data
+nausea_graph <- plot(nausea$Nausea_before~nausea$Patient, type= 'l', col= "blue", ylim=c(0, 6), xlab= 'Patients', ylab= 'Nausea score', main= 'The intensity of nausea before and after treatment with a 5-HT3-receptor blocker')
+lines(nausea$Nausea_after ~ nausea$Patient, col= 'red')
+legend('top', c('nausea before', 'nausea after'), fill = c('blue', 'red'))
+# statistical test
+## the data is paired and non-parametric.we analyse two measurment from the same sample.
+wilcox.test(nausea$Nausea_before, nausea$Nausea_after, paired = TRUE)
+#p-value
+##p-value<0.05
+#conclusion
+#we reject the null hypothesis, therefore, chemioterapy treatment cause nausea.
+
+
+```
+## assignment 6
+```{r}
+
+# Null hypothesis
+## Ho= the housing price is not dependant on the interest rate
+#importing and reading data
+library(knitr)
+library(readr)
+getwd()
+houses <- read.csv('housing-prices.csv')
+houses
+#tidy data
+Interest= houses$interest_rate
+houses_prices= houses$median_house_price_USD
+head(cbind(Interest, houses_prices))
+# Plot data
+plot(Interest, houses_prices, xlab = "Interest rate", ylab = "House prices")
+abline(lm(houses$median_house_price_USD ~ houses$interest_rate, data = houses), col= 'red') # to determine linear relationship and outliers
+# statistical test
+# pearson linear regression test
+houses_lm <- lm(houses$median_house_price_USD ~ houses$interest_rate, data = houses)
+houses_lm
+# Diagnostic test 1 : HOMOSKEDACITY
+plot(x= houses_lm$fitted.values, y= houses_lm$residuals, main = "Homoskedacity",col= 'blue', lwd= 2)
+abline(h= 0, col= 'red', lwd= 2)
+# Diagnostic test 2: QQPlot
+# to determine if the residuals are normally distributed
+qqnorm(houses_lm$residuals)
+qqline(houses_lm$residuals)
+#the variables have non-Gaussian error distribution, thus we will do a generalized linear model test.
+g2 <- glm(houses$median_house_price_USD~houses$interest_rate, data = houses)
+
+summary(g2)
+#degree of freedom and p-value
+##df=15
+##p-value<0.05
+#conclusion
+#we reject the null hypothesis, therefore, the housisng price is dependent on the interest rate.
+
+
+
+```
